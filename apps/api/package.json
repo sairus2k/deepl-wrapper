@@ -1,0 +1,16 @@
+{
+  "name": "api",
+  "version": "0.0.0",
+  "description": "",
+  "keywords": [],
+  "license": "MIT",
+  "author": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "deepl-node": "^1.21.0",
+    "hono": "^4.10.5"
+  }
+}
