@@ -1,12 +1,17 @@
 {
   "name": "deepl-wrapper",
   "version": "0.0.0",
-  "description": "",
-  "keywords": [],
+  "description": "A simple web wrapper for DeepL API that enables translation of file formats not supported in DeepL's free web version",
+  "keywords": ["deepl", "translation", "api", "file-translator"],
   "license": "MIT",
   "author": "",
-  "main": "index.js",
   "scripts": {
+    "dev": "pnpm --parallel -r dev",
+    "dev:web": "pnpm --filter web dev",
+    "dev:api": "pnpm --filter api dev",
+    "build": "pnpm -r build",
+    "build:web": "pnpm --filter web build",
+    "build:api": "pnpm --filter api build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "packageManager": "pnpm@10.21.0",

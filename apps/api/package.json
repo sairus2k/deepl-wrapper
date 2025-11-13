@@ -1,16 +1,27 @@
 {
   "name": "api",
   "version": "0.0.0",
-  "description": "",
+  "description": "DeepL File Translator API",
   "keywords": [],
   "license": "MIT",
   "author": "",
-  "main": "index.js",
+  "type": "module",
+  "main": "src/index.ts",
   "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "@hono/node-server": "^1.13.7",
     "deepl-node": "^1.21.0",
+    "dotenv": "^16.4.7",
     "hono": "^4.10.5"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "~5.9.3"
   }
 }
