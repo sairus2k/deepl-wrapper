@@ -1,11 +1,11 @@
 import 'dotenv/config'
+import { readFile, unlink, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { serve } from '@hono/node-server'
 import * as deepl from 'deepl-node'
-import { readFile, unlink, writeFile } from 'fs/promises'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
-import { tmpdir } from 'os'
-import { join } from 'path'
 
 const app = new Hono()
 
@@ -115,17 +115,19 @@ app.post('/translate', async (c) => {
 				'Content-Disposition': `attachment; filename="${outputFilename}"`,
 			},
 		})
-	} catch (error: any) {
+	} catch (error: unknown) {
 		console.error('Translation error:', error)
 
 		// Clean up temp files on error
 		await unlink(inputPath).catch(() => {})
 		await unlink(outputPath).catch(() => {})
 
+		const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+
 		return c.json(
 			{
 				error: 'Translation failed',
-				message: error.message || 'Unknown error',
+				message: errorMessage,
 			},
 			500,
 		)

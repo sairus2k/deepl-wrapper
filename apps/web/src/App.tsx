@@ -13,6 +13,11 @@ interface Languages {
 
 const API_URL = import.meta.env.VITE_API_URL || '/api'
 
+async function fetchLanguages() {
+	const response = await fetch(`${API_URL}/languages`)
+	return await response.json()
+}
+
 function App() {
 	const [file, setFile] = useState<File | null>(null)
 	const [sourceLang, setSourceLang] = useState<string>('')
@@ -23,21 +28,19 @@ function App() {
 	const [dragActive, setDragActive] = useState(false)
 
 	useEffect(() => {
-		fetchLanguages()
-	}, [])
-
-	const fetchLanguages = async () => {
-		try {
-			const response = await fetch(`${API_URL}/languages`)
-			const data = await response.json()
-			setLanguages(data)
-		} catch (err) {
-			console.error('Failed to fetch languages:', err)
-			setError(
-				'Failed to load supported languages. Please check your API connection.',
-			)
+		const loadLanguages = async () => {
+			try {
+				const data = await fetchLanguages()
+				setLanguages(data)
+			} catch (err) {
+				console.error('Failed to fetch languages:', err)
+				setError(
+					'Failed to load supported languages. Please check your API connection.',
+				)
+			}
 		}
-	}
+		void loadLanguages()
+	}, [])
 
 	const handleDrag = (e: React.DragEvent) => {
 		e.preventDefault()
@@ -54,15 +57,24 @@ function App() {
 		e.stopPropagation()
 		setDragActive(false)
 
-		if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-			setFile(e.dataTransfer.files[0])
+		const droppedFile = e.dataTransfer.files?.[0]
+		if (droppedFile) {
+			setFile(droppedFile)
 			setError('')
 		}
 	}
 
+	const handleKeyDown = (e: React.KeyboardEvent) => {
+		if (e.key === 'Enter' || e.key === ' ') {
+			e.preventDefault()
+			document.getElementById('file-input')?.click()
+		}
+	}
+
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		if (e.target.files && e.target.files[0]) {
-			setFile(e.target.files[0])
+		const selectedFile = e.target.files?.[0]
+		if (selectedFile) {
+			setFile(selectedFile)
 			setError('')
 		}
 	}
@@ -110,11 +122,7 @@ function App() {
 			// Get filename from Content-Disposition header or generate one
 			const contentDisposition = response.headers.get('Content-Disposition')
 			const filenameMatch = contentDisposition?.match(/filename="(.+)"/)
-			const filename = filenameMatch
-				? filenameMatch[1]
-				: `translated_${file.name}`
-
-			a.download = filename
+			a.download = filenameMatch ? filenameMatch[1] : `translated_${file.name}`
 			document.body.appendChild(a)
 			a.click()
 			window.URL.revokeObjectURL(url)
@@ -126,8 +134,12 @@ function App() {
 				'file-input',
 			) as HTMLInputElement
 			if (fileInput) fileInput.value = ''
-		} catch (err: any) {
-			setError(err.message || 'Translation failed. Please try again.')
+		} catch (err: unknown) {
+			const errorMessage =
+				err instanceof Error
+					? err.message
+					: 'Translation failed. Please try again.'
+			setError(errorMessage)
 		} finally {
 			setIsLoading(false)
 		}
@@ -162,6 +174,9 @@ function App() {
 							onDragLeave={handleDrag}
 							onDragOver={handleDrag}
 							onDrop={handleDrop}
+							role="button"
+							tabIndex={0}
+							onKeyDown={handleKeyDown}
 						>
 							<input
 								id="file-input"
