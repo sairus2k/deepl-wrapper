@@ -1,23 +1,32 @@
 {
-  "name": "deepl-wrapper",
-  "version": "0.0.0",
-  "description": "A simple web wrapper for DeepL API that enables translation of file formats not supported in DeepL's free web version",
-  "keywords": ["deepl", "translation", "api", "file-translator"],
-  "license": "MIT",
-  "author": "",
-  "scripts": {
-    "dev": "pnpm --parallel -r dev",
-    "dev:web": "pnpm --filter web dev",
-    "dev:api": "pnpm --filter api dev",
-    "build": "pnpm -r build",
-    "build:web": "pnpm --filter web build",
-    "build:api": "pnpm --filter api build",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "packageManager": "pnpm@10.21.0",
-  "pnpm": {
-    "overrides": {
-      "vite": "npm:rolldown-vite@7.2.2"
-    }
-  }
+	"name": "deepl-wrapper",
+	"version": "0.0.0",
+	"description": "A simple web wrapper for DeepL API that enables translation of file formats not supported in DeepL's free web version",
+	"keywords": [
+		"deepl",
+		"translation",
+		"api",
+		"file-translator"
+	],
+	"license": "MIT",
+	"author": "",
+	"scripts": {
+		"dev": "pnpm --parallel -r dev",
+		"dev:web": "pnpm --filter web dev",
+		"dev:api": "pnpm --filter api dev",
+		"build": "pnpm -r build",
+		"build:web": "pnpm --filter web build",
+		"build:api": "pnpm --filter api build",
+		"lint": "biome lint --fix",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"packageManager": "pnpm@10.21.0",
+	"pnpm": {
+		"overrides": {
+			"vite": "npm:rolldown-vite@7.2.2"
+		}
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.3.5"
+	}
 }
