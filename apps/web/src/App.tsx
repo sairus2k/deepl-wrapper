@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import './App.css'
 
 interface Language {
 	code: string
@@ -148,118 +147,150 @@ function App() {
 	const supportedFormats = ['TXT', 'HTML', 'XLSX', 'XLIFF', 'SRT']
 
 	return (
-		<div className="app">
-			<header className="header">
-				<h1>DeepL File Translator</h1>
-				<p className="subtitle">Translate files using DeepL API</p>
+		<div className="min-h-screen flex flex-col">
+			<header className="text-center py-8 px-4 bg-gradient-to-br from-primary to-secondary text-white shadow-lg">
+				<h1 className="text-4xl font-bold mb-2">DeepL File Translator</h1>
+				<p className="text-lg opacity-95">Translate files using DeepL API</p>
 			</header>
 
-			<main className="main">
-				<div className="card">
-					<div className="formats">
-						<p className="formats-label">Supported formats:</p>
-						<div className="format-badges">
-							{supportedFormats.map((format) => (
-								<span key={format} className="format-badge">
-									{format}
-								</span>
-							))}
+			<main className="flex-1 max-w-3xl w-full mx-auto p-8">
+				<div className="card bg-base-100 shadow-xl">
+					<div className="card-body">
+						<div className="text-center mb-6">
+							<p className="text-sm font-medium text-base-content/70 mb-3">
+								Supported formats:
+							</p>
+							<div className="flex gap-2 justify-center flex-wrap">
+								{supportedFormats.map((format) => (
+									<span key={format} className="badge badge-primary badge-lg">
+										{format}
+									</span>
+								))}
+							</div>
 						</div>
-					</div>
 
-					<form onSubmit={handleSubmit} className="form">
-						<div
-							className={`file-drop-zone ${dragActive ? 'drag-active' : ''} ${file ? 'has-file' : ''}`}
-							onDragEnter={handleDrag}
-							onDragLeave={handleDrag}
-							onDragOver={handleDrag}
-							onDrop={handleDrop}
-							role="button"
-							tabIndex={0}
-							onKeyDown={handleKeyDown}
-						>
-							<input
-								id="file-input"
-								type="file"
-								onChange={handleFileChange}
-								className="file-input"
-								accept=".txt,.html,.xlsx,.xliff,.srt"
-							/>
-							<label htmlFor="file-input" className="file-label">
-								{file ? (
-									<>
-										<span className="file-icon">📄</span>
-										<span className="file-name">{file.name}</span>
-										<span className="file-size">
-											({(file.size / 1024).toFixed(2)} KB)
+						<form onSubmit={handleSubmit} className="flex flex-col gap-6">
+							<div
+								className={`border-2 border-dashed rounded-box p-12 text-center transition-all cursor-pointer ${
+									dragActive
+										? 'border-primary bg-primary/10 scale-105'
+										: file
+											? 'border-success bg-success/10'
+											: 'border-base-300 bg-base-200 hover:border-primary hover:bg-base-300'
+								}`}
+								onDragEnter={handleDrag}
+								onDragLeave={handleDrag}
+								onDragOver={handleDrag}
+								onDrop={handleDrop}
+								role="button"
+								tabIndex={0}
+								onKeyDown={handleKeyDown}
+							>
+								<input
+									id="file-input"
+									type="file"
+									onChange={handleFileChange}
+									className="hidden"
+									accept=".txt,.html,.xlsx,.xliff,.srt"
+								/>
+								<label
+									htmlFor="file-input"
+									className="cursor-pointer flex flex-col gap-2 items-center"
+								>
+									{file ? (
+										<>
+											<span className="text-4xl">📄</span>
+											<span className="font-semibold text-base-content break-all">
+												{file.name}
+											</span>
+											<span className="text-sm text-base-content/60">
+												({(file.size / 1024).toFixed(2)} KB)
+											</span>
+										</>
+									) : (
+										<>
+											<span className="text-5xl">📁</span>
+											<span className="text-base-content/70">
+												Drop your file here or click to browse
+											</span>
+										</>
+									)}
+								</label>
+							</div>
+
+							<div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-4 items-end">
+								<div className="form-control">
+									<label htmlFor="source-lang" className="label">
+										<span className="label-text font-semibold">
+											Source Language
 										</span>
-									</>
-								) : (
-									<>
-										<span className="upload-icon">📁</span>
-										<span>Drop your file here or click to browse</span>
-									</>
-								)}
-							</label>
-						</div>
+									</label>
+									<select
+										id="source-lang"
+										value={sourceLang}
+										onChange={(e) => setSourceLang(e.target.value)}
+										className="select select-bordered w-full"
+									>
+										<option value="">Auto-detect</option>
+										{languages?.source.map((lang) => (
+											<option key={lang.code} value={lang.code}>
+												{lang.name}
+											</option>
+										))}
+									</select>
+								</div>
 
-						<div className="language-selectors">
-							<div className="language-group">
-								<label htmlFor="source-lang">Source Language</label>
-								<select
-									id="source-lang"
-									value={sourceLang}
-									onChange={(e) => setSourceLang(e.target.value)}
-									className="language-select"
-								>
-									<option value="">Auto-detect</option>
-									{languages?.source.map((lang) => (
-										<option key={lang.code} value={lang.code}>
-											{lang.name}
-										</option>
-									))}
-								</select>
+								<div className="text-2xl text-primary font-bold pb-2 hidden lg:block">
+									→
+								</div>
+
+								<div className="form-control">
+									<label htmlFor="target-lang" className="label">
+										<span className="label-text font-semibold">
+											Target Language *
+										</span>
+									</label>
+									<select
+										id="target-lang"
+										value={targetLang}
+										onChange={(e) => setTargetLang(e.target.value)}
+										className="select select-bordered w-full"
+										required
+									>
+										{languages?.target.map((lang) => (
+											<option key={lang.code} value={lang.code}>
+												{lang.name}
+											</option>
+										))}
+									</select>
+								</div>
 							</div>
 
-							<div className="arrow">→</div>
+							{error && (
+								<div className="alert alert-error">
+									<span>{error}</span>
+								</div>
+							)}
 
-							<div className="language-group">
-								<label htmlFor="target-lang">Target Language *</label>
-								<select
-									id="target-lang"
-									value={targetLang}
-									onChange={(e) => setTargetLang(e.target.value)}
-									className="language-select"
-									required
-								>
-									{languages?.target.map((lang) => (
-										<option key={lang.code} value={lang.code}>
-											{lang.name}
-										</option>
-									))}
-								</select>
-							</div>
-						</div>
-
-						{error && <div className="error-message">{error}</div>}
-
-						<button
-							type="submit"
-							disabled={isLoading || !file}
-							className="submit-button"
-						>
-							{isLoading ? 'Translating...' : 'Translate File'}
-						</button>
-					</form>
+							<button
+								type="submit"
+								disabled={isLoading || !file}
+								className="btn btn-primary btn-lg"
+							>
+								{isLoading ? 'Translating...' : 'Translate File'}
+							</button>
+						</form>
+					</div>
 				</div>
 
-				<footer className="footer">
-					<p>
+				<footer className="text-center mt-8 p-4">
+					<p className="text-base-content/60">
 						Get your free DeepL API key at{' '}
 						<a
 							href="https://www.deepl.com/pro-api"
 							target="_blank"
 							rel="noopener noreferrer"
+							className="link link-primary font-semibold"
 						>
 							deepl.com/pro-api
 						</a>
