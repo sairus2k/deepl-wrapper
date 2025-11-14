@@ -24,7 +24,6 @@ function App() {
 	const [languages, setLanguages] = useState<Languages | null>(null)
 	const [isLoading, setIsLoading] = useState(false)
 	const [error, setError] = useState<string>('')
-	const [dragActive, setDragActive] = useState(false)
 
 	useEffect(() => {
 		const loadLanguages = async () => {
@@ -40,35 +39,6 @@ function App() {
 		}
 		void loadLanguages()
 	}, [])
-
-	const handleDrag = (e: React.DragEvent) => {
-		e.preventDefault()
-		e.stopPropagation()
-		if (e.type === 'dragenter' || e.type === 'dragover') {
-			setDragActive(true)
-		} else if (e.type === 'dragleave') {
-			setDragActive(false)
-		}
-	}
-
-	const handleDrop = (e: React.DragEvent) => {
-		e.preventDefault()
-		e.stopPropagation()
-		setDragActive(false)
-
-		const droppedFile = e.dataTransfer.files?.[0]
-		if (droppedFile) {
-			setFile(droppedFile)
-			setError('')
-		}
-	}
-
-	const handleKeyDown = (e: React.KeyboardEvent) => {
-		if (e.key === 'Enter' || e.key === ' ') {
-			e.preventDefault()
-			document.getElementById('file-input')?.click()
-		}
-	}
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const selectedFile = e.target.files?.[0]
@@ -129,10 +99,6 @@ function App() {
 
 			// Reset form
 			setFile(null)
-			const fileInput = document.getElementById(
-				'file-input',
-			) as HTMLInputElement
-			if (fileInput) fileInput.value = ''
 		} catch (err: unknown) {
 			const errorMessage =
 				err instanceof Error
@@ -170,52 +136,24 @@ function App() {
 						</div>
 
 						<form onSubmit={handleSubmit} className="flex flex-col gap-6">
-							<div
-								className={`border-2 border-dashed rounded-box p-12 text-center transition-all cursor-pointer ${
-									dragActive
-										? 'border-primary bg-primary/10 scale-105'
-										: file
-											? 'border-success bg-success/10'
-											: 'border-base-300 bg-base-200 hover:border-primary hover:bg-base-300'
-								}`}
-								onDragEnter={handleDrag}
-								onDragLeave={handleDrag}
-								onDragOver={handleDrag}
-								onDrop={handleDrop}
-								role="button"
-								tabIndex={0}
-								onKeyDown={handleKeyDown}
-							>
+							<div className="form-control">
+								<label htmlFor="file-input" className="label">
+									<span className="label-text font-semibold">Select File</span>
+								</label>
 								<input
 									id="file-input"
 									type="file"
 									onChange={handleFileChange}
-									className="hidden"
-									accept=".txt,.html,.xlsx,.xliff,.srt"
+									className="file-input file-input-bordered file-input-primary w-full"
+									accept=".doc,.docx,.pdf,.pptx,.txt,.html,.xlsx,.xliff,.srt"
 								/>
-								<label
-									htmlFor="file-input"
-									className="cursor-pointer flex flex-col gap-2 items-center"
-								>
-									{file ? (
-										<>
-											<span className="text-4xl">📄</span>
-											<span className="font-semibold text-base-content break-all">
-												{file.name}
-											</span>
-											<span className="text-sm text-base-content/60">
-												({(file.size / 1024).toFixed(2)} KB)
-											</span>
-										</>
-									) : (
-										<>
-											<span className="text-5xl">📁</span>
-											<span className="text-base-content/70">
-												Drop your file here or click to browse
-											</span>
-										</>
-									)}
-								</label>
+								{file && (
+									<div className="label">
+										<span className="label-text-alt">
+											{file.name} ({(file.size / 1024).toFixed(2)} KB)
+										</span>
+									</div>
+								)}
 							</div>
 
 							<div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-4 items-end">
