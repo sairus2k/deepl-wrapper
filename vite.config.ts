@@ -15,6 +15,9 @@ export default defineConfig({
 	server: {
 		host: true,
 		allowedHosts: true,
+		// Note: API routes are handled by Cloudflare Pages Functions
+		// For local dev, use `pnpm pages:dev` instead of `pnpm dev`
+		// Or keep the old API server running with `pnpm dev:api`
 		proxy: {
 			'/api': {
 				target: 'http://localhost:3001',

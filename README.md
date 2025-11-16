@@ -16,17 +16,19 @@ A lightweight web application that lets you translate these additional file form
 - 🔑 **Use your own DeepL API key** — No middleman, direct API access
 - 🔒 **Privacy-first** — Files are processed and immediately discarded
 - ⚡ **Fast & simple** — No registration, no database, no bloat
+- ☁️ **Serverless deployment** — Runs on Cloudflare Pages with edge functions
 
 ## Tech Stack
 
 **Frontend:**
-- Vite
-- React
+- React 19
 - TypeScript
+- Vite (Rolldown)
+- Tailwind CSS 4 + DaisyUI
 
 **Backend:**
-- Hono framework
-- DeepL official SDK
+- Cloudflare Pages Functions
+- DeepL API (REST)
 - TypeScript
 
 ## Quick Start
@@ -42,20 +44,50 @@ cd deepl-wrapper
 pnpm install
 
 # Configure your DeepL API key
-cp .env.example .env
-# Edit .env and add your DEEPL_API_KEY
+cp .dev.vars.example .dev.vars
+# Edit .dev.vars and add your DEEPL_API_KEY
 
-# Start development server
+# Frontend development (with HMR)
 pnpm dev
+
+# Test with Cloudflare Pages locally
+pnpm build
+pnpm pages:dev
 ```
+
+## Deployment
+
+### Deploy to Cloudflare Pages
+
+1. Login to Cloudflare:
+   ```bash
+   pnpm wrangler login
+   ```
+
+2. Deploy:
+   ```bash
+   pnpm pages:deploy
+   ```
+
+3. Add your `DEEPL_API_KEY` in Cloudflare Dashboard:
+   - Go to your Pages project → Settings → Environment Variables
+   - Add `DEEPL_API_KEY` for both Production and Preview environments
+
+### Alternative: Git Integration
+
+Connect your repository in Cloudflare Dashboard:
+- **Build command**: `pnpm install && pnpm build`
+- **Build output directory**: `dist`
+- **Environment variable**: `DEEPL_API_KEY`
 
 ## How It Works
 
-1. Configure your DeepL API key in environment variables
-2. Upload your file (TXT, HTML, or SRT)
-3. Select source and target languages
-4. Click translate
-5. Download the translated file
+1. Upload your file (TXT, HTML, XLSX, XLIFF, or SRT)
+2. Select source and target languages
+3. Click translate
+4. Download the translated file
+
+Files are processed via DeepL API and immediately discarded — nothing is stored.
 
 ## License
 

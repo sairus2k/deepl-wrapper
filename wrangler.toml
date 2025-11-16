@@ -1,0 +1,6 @@
+name = "deepl-wrapper"
+compatibility_date = "2024-11-15"
+pages_build_output_dir = "./dist"
+
+# Local environment variables should be in .dev.vars file
+# Production/preview secrets configured in Cloudflare dashboard
