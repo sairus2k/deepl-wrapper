@@ -10,6 +10,11 @@ interface Languages {
 	target: Language[]
 }
 
+interface UsageData {
+	characterCount: number
+	characterLimit: number
+}
+
 const API_URL = import.meta.env.VITE_API_URL || '/api'
 const STORAGE_KEY = 'deepl_api_key'
 
@@ -18,6 +23,18 @@ async function fetchLanguages(apiKey: string) {
 		'X-DeepL-API-Key': apiKey,
 	}
 	const response = await fetch(`${API_URL}/languages`, { headers })
+	return await response.json()
+}
+
+async function fetchUsage(apiKey: string): Promise<UsageData> {
+	const headers: HeadersInit = {
+		'X-DeepL-API-Key': apiKey,
+	}
+	const response = await fetch(`${API_URL}/usage`, { headers })
+	if (!response.ok) {
+		const errorData = await response.json()
+		throw new Error(errorData.message || 'Failed to fetch usage data')
+	}
 	return await response.json()
 }
 
@@ -30,6 +47,9 @@ function App() {
 	const [error, setError] = useState<string>('')
 	const [apiKey, setApiKey] = useState<string>('')
 	const [showApiKeyInput, setShowApiKeyInput] = useState(false)
+	const [usageData, setUsageData] = useState<UsageData | null>(null)
+	const [usageError, setUsageError] = useState<string>('')
+	const [isLoadingUsage, setIsLoadingUsage] = useState(false)
 
 	// Load API key from localStorage on mount
 	useEffect(() => {
@@ -61,6 +81,31 @@ function App() {
 		void loadLanguages()
 	}, [apiKey])
 
+	useEffect(() => {
+		const loadUsage = async () => {
+			// Skip loading if we don't have an API key or if API key input is shown
+			if (!apiKey || showApiKeyInput) {
+				return
+			}
+
+			setIsLoadingUsage(true)
+			setUsageError('')
+
+			try {
+				const data = await fetchUsage(apiKey)
+				setUsageData(data)
+			} catch (err) {
+				console.error('Failed to fetch usage data:', err)
+				setUsageError(
+					err instanceof Error ? err.message : 'Failed to load usage data',
+				)
+			} finally {
+				setIsLoadingUsage(false)
+			}
+		}
+		void loadUsage()
+	}, [apiKey, showApiKeyInput])
+
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const selectedFile = e.target.files?.[0]
 		if (selectedFile) {
@@ -89,6 +134,28 @@ function App() {
 		setApiKey('')
 		setShowApiKeyInput(true)
 		setLanguages(null)
+		setUsageData(null)
+	}
+
+	const refreshUsage = async () => {
+		if (!apiKey) {
+			return
+		}
+
+		setIsLoadingUsage(true)
+		setUsageError('')
+
+		try {
+			const data = await fetchUsage(apiKey)
+			setUsageData(data)
+		} catch (err) {
+			console.error('Failed to fetch usage data:', err)
+			setUsageError(
+				err instanceof Error ? err.message : 'Failed to load usage data',
+			)
+		} finally {
+			setIsLoadingUsage(false)
+		}
 	}
 
 	const handleSubmit = async (e: React.FormEvent) => {
@@ -147,6 +214,9 @@ function App() {
 
 			// Reset form
 			setFile(null)
+
+			// Refresh usage statistics after successful translation
+			void refreshUsage()
 		} catch (err: unknown) {
 			const errorMessage =
 				err instanceof Error
@@ -216,27 +286,99 @@ function App() {
 				)}
 
 				{!showApiKeyInput && apiKey && (
-					<div className="alert mb-6 shadow-lg">
-						<div className="flex-1">
-							<span>API key configured</span>
+					<>
+						<div className="alert mb-6 shadow-lg">
+							<div className="flex-1">
+								<span>API key configured</span>
+							</div>
+							<div className="flex gap-2">
+								<button
+									type="button"
+									onClick={handleApiKeyChange}
+									className="btn btn-sm btn-ghost"
+								>
+									Change
+								</button>
+								<button
+									type="button"
+									onClick={handleApiKeyClear}
+									className="btn btn-sm btn-ghost"
+								>
+									Clear
+								</button>
+							</div>
 						</div>
-						<div className="flex gap-2">
-							<button
-								type="button"
-								onClick={handleApiKeyChange}
-								className="btn btn-sm btn-ghost"
-							>
-								Change
-							</button>
-							<button
-								type="button"
-								onClick={handleApiKeyClear}
-								className="btn btn-sm btn-ghost"
-							>
-								Clear
-							</button>
+
+						{/* Usage Statistics Card */}
+						<div className="card bg-base-100 shadow-xl mb-6">
+							<div className="card-body">
+								<div className="flex justify-between items-center mb-4">
+									<h2 className="card-title text-xl">API Usage Statistics</h2>
+									<button
+										type="button"
+										onClick={refreshUsage}
+										disabled={isLoadingUsage}
+										className="btn btn-sm btn-ghost"
+										title="Refresh usage statistics"
+									>
+										<svg
+											role="graphics-symbol"
+											xmlns="http://www.w3.org/2000/svg"
+											fill="none"
+											viewBox="0 0 24 24"
+											strokeWidth={2}
+											stroke="currentColor"
+											className={`w-4 h-4 ${isLoadingUsage ? 'animate-spin' : ''}`}
+										>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
+											/>
+										</svg>
+									</button>
+								</div>
+
+								{isLoadingUsage && (
+									<div className="flex justify-center py-4">
+										<span className="loading loading-spinner loading-lg text-primary" />
+									</div>
+								)}
+
+								{usageError && !isLoadingUsage && (
+									<div className="alert alert-error">
+										<span>{usageError}</span>
+									</div>
+								)}
+
+								{usageData && !isLoadingUsage && (
+									<div>
+										<div className="flex justify-between items-center mb-2">
+											<span className="text-sm font-semibold">
+												Character Usage
+											</span>
+											<span className="text-sm font-mono">
+												{usageData.characterCount.toLocaleString()} /{' '}
+												{usageData.characterLimit.toLocaleString()}
+											</span>
+										</div>
+										<progress
+											className="progress progress-primary w-full"
+											value={usageData.characterCount}
+											max={usageData.characterLimit}
+										/>
+										<div className="text-xs text-base-content/60 mt-1">
+											{(
+												(usageData.characterCount / usageData.characterLimit) *
+												100
+											).toFixed(1)}
+											% used
+										</div>
+									</div>
+								)}
+							</div>
 						</div>
-					</div>
+					</>
 				)}
 
 				<div className="card bg-base-100 shadow-xl">

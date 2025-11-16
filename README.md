@@ -14,6 +14,7 @@ A lightweight web application that lets you translate these additional file form
 
 - 📄 **Formats DeepL web doesn't support**: TXT, HTML, XLSX, XLIFF, SRT
 - 🔑 **Bring Your Own Key (BYOK)** — Use your own DeepL API key, stored locally in your browser
+- 📊 **Usage Statistics** — Track your API character usage with real-time progress visualization
 - 🔒 **Privacy-first** — Files are processed and immediately discarded
 - ⚡ **Fast & simple** — No registration, no database, no bloat
 - ☁️ **Serverless deployment** — Runs on Cloudflare Pages with edge functions
@@ -86,12 +87,15 @@ Connect your repository in Cloudflare Dashboard:
 
 ## How It Works
 
-1. Upload your file (TXT, HTML, XLSX, XLIFF, or SRT)
-2. Select source and target languages
-3. Click translate
-4. Download the translated file
+1. Enter your DeepL API key (stored locally in your browser)
+2. Upload your file (TXT, HTML, XLSX, XLIFF, or SRT)
+3. Select source and target languages
+4. Click translate
+5. Download the translated file
 
 Files are processed via DeepL API and immediately discarded — nothing is stored.
+
+The app displays real-time API usage statistics with a visual progress bar that auto-updates after each translation.
 
 ## License
 
