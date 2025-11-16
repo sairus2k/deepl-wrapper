@@ -47,12 +47,10 @@ pnpm install
 cp .dev.vars.example .dev.vars
 # Edit .dev.vars and add your DEEPL_API_KEY
 
-# Frontend development (with HMR)
+# Development (runs both Vite + Wrangler with HMR)
 pnpm dev
-
-# Test with Cloudflare Pages locally
-pnpm build
-pnpm pages:dev
+# App will be available at http://localhost:5173
+# API functions run on http://localhost:8788
 ```
 
 ## Deployment
@@ -66,7 +64,7 @@ pnpm pages:dev
 
 2. Deploy:
    ```bash
-   pnpm pages:deploy
+   pnpm deploy
    ```
 
 3. Add your `DEEPL_API_KEY` in Cloudflare Dashboard:
