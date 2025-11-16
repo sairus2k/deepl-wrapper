@@ -13,10 +13,11 @@ A lightweight web application that lets you translate these additional file form
 ## Features
 
 - 📄 **Formats DeepL web doesn't support**: TXT, HTML, XLSX, XLIFF, SRT
-- 🔑 **Use your own DeepL API key** — No middleman, direct API access
+- 🔑 **Bring Your Own Key (BYOK)** — Use your own DeepL API key, stored locally in your browser
 - 🔒 **Privacy-first** — Files are processed and immediately discarded
 - ⚡ **Fast & simple** — No registration, no database, no bloat
 - ☁️ **Serverless deployment** — Runs on Cloudflare Pages with edge functions
+- 💾 **Client-side API key storage** — Your API key never leaves your browser
 
 ## Tech Stack
 
@@ -33,8 +34,6 @@ A lightweight web application that lets you translate these additional file form
 
 ## Quick Start
 
-Get your free DeepL API key at https://www.deepl.com/pro-api
-
 ```bash
 # Clone repository
 git clone https://github.com/sairus2k/deepl-wrapper.git
@@ -43,15 +42,25 @@ cd deepl-wrapper
 # Install dependencies
 pnpm install
 
-# Configure your DeepL API key
-cp .dev.vars.example .dev.vars
-# Edit .dev.vars and add your DEEPL_API_KEY
-
 # Development (runs both Vite + Wrangler with HMR)
 pnpm dev
 # App will be available at http://localhost:5173
 # API functions run on http://localhost:8788
 ```
+
+When you first open the app, you'll be prompted to enter your DeepL API key. Get your free API key at https://www.deepl.com/pro-api
+
+Your API key is stored in your browser's localStorage and is sent directly to DeepL's API with each request.
+
+## How API Keys Work
+
+This application uses a **Bring Your Own Key (BYOK)** approach:
+
+- When you first visit the app, you'll be prompted to enter your DeepL API key
+- Your API key is stored in your browser's localStorage
+- The key is sent directly to DeepL's API with each translation request via the `X-DeepL-API-Key` header
+- Your API key never leaves your browser or gets stored on any server
+- You can change or clear your API key at any time using the UI buttons
 
 ## Deployment
 
@@ -67,16 +76,13 @@ pnpm dev
    pnpm deploy
    ```
 
-3. Add your `DEEPL_API_KEY` in Cloudflare Dashboard:
-   - Go to your Pages project → Settings → Environment Variables
-   - Add `DEEPL_API_KEY` for both Production and Preview environments
+That's it! No environment variables or secrets required. Users will enter their own API keys when they use the app.
 
 ### Alternative: Git Integration
 
 Connect your repository in Cloudflare Dashboard:
-- **Build command**: `pnpm install && pnpm build`
+- **Build command**: `pnpm build`
 - **Build output directory**: `dist`
-- **Environment variable**: `DEEPL_API_KEY`
 
 ## How It Works
 

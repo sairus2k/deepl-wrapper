@@ -1,5 +1,5 @@
 // Cloudflare Pages Function for health check
-export const onRequestGet: PagesFunction<Env> = async () => {
+export const onRequestGet: PagesFunction = async () => {
 	return new Response(
 		JSON.stringify({
 			status: 'ok',

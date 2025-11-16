@@ -11,9 +11,13 @@ interface Languages {
 }
 
 const API_URL = import.meta.env.VITE_API_URL || '/api'
+const STORAGE_KEY = 'deepl_api_key'
 
-async function fetchLanguages() {
-	const response = await fetch(`${API_URL}/languages`)
+async function fetchLanguages(apiKey: string) {
+	const headers: HeadersInit = {
+		'X-DeepL-API-Key': apiKey,
+	}
+	const response = await fetch(`${API_URL}/languages`, { headers })
 	return await response.json()
 }
 
@@ -24,21 +28,38 @@ function App() {
 	const [languages, setLanguages] = useState<Languages | null>(null)
 	const [isLoading, setIsLoading] = useState(false)
 	const [error, setError] = useState<string>('')
+	const [apiKey, setApiKey] = useState<string>('')
+	const [showApiKeyInput, setShowApiKeyInput] = useState(false)
+
+	// Load API key from localStorage on mount
+	useEffect(() => {
+		const storedKey = localStorage.getItem(STORAGE_KEY)
+		if (storedKey) {
+			setApiKey(storedKey)
+		} else {
+			setShowApiKeyInput(true)
+		}
+	}, [])
 
 	useEffect(() => {
 		const loadLanguages = async () => {
+			// Skip loading if we don't have an API key
+			if (!apiKey) {
+				return
+			}
+
 			try {
-				const data = await fetchLanguages()
+				const data = await fetchLanguages(apiKey)
 				setLanguages(data)
 			} catch (err) {
 				console.error('Failed to fetch languages:', err)
 				setError(
-					'Failed to load supported languages. Please check your API connection.',
+					'Failed to load supported languages. Please check your API key and connection.',
 				)
 			}
 		}
 		void loadLanguages()
-	}, [])
+	}, [apiKey])
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const selectedFile = e.target.files?.[0]
@@ -46,6 +67,28 @@ function App() {
 			setFile(selectedFile)
 			setError('')
 		}
+	}
+
+	const handleApiKeySubmit = (e: React.FormEvent) => {
+		e.preventDefault()
+		if (apiKey.trim()) {
+			localStorage.setItem(STORAGE_KEY, apiKey.trim())
+			setShowApiKeyInput(false)
+			setError('')
+		} else {
+			setError('Please enter a valid API key')
+		}
+	}
+
+	const handleApiKeyChange = () => {
+		setShowApiKeyInput(true)
+	}
+
+	const handleApiKeyClear = () => {
+		localStorage.removeItem(STORAGE_KEY)
+		setApiKey('')
+		setShowApiKeyInput(true)
+		setLanguages(null)
 	}
 
 	const handleSubmit = async (e: React.FormEvent) => {
@@ -72,8 +115,13 @@ function App() {
 				formData.append('sourceLang', sourceLang)
 			}
 
+			const headers: HeadersInit = {
+				'X-DeepL-API-Key': apiKey,
+			}
+
 			const response = await fetch(`${API_URL}/translate`, {
 				method: 'POST',
+				headers,
 				body: formData,
 			})
 
@@ -120,6 +168,77 @@ function App() {
 			</header>
 
 			<main className="flex-1 max-w-3xl w-full mx-auto p-8">
+				{showApiKeyInput && (
+					<div className="card bg-base-100 shadow-xl mb-6">
+						<div className="card-body">
+							<h2 className="card-title text-2xl mb-4">
+								DeepL API Key Required
+							</h2>
+							<p className="text-base-content/70 mb-4">
+								Please enter your DeepL API key to use the translation service.
+								Your key will be stored locally in your browser.
+							</p>
+							<form
+								onSubmit={handleApiKeySubmit}
+								className="flex flex-col gap-4"
+							>
+								<div className="form-control">
+									<input
+										type="text"
+										value={apiKey}
+										onChange={(e) => setApiKey(e.target.value)}
+										placeholder="Enter your DeepL API key"
+										className="input input-bordered input-primary w-full"
+									/>
+								</div>
+								{error && (
+									<div className="alert alert-error">
+										<span>{error}</span>
+									</div>
+								)}
+								<button type="submit" className="btn btn-primary">
+									Save API Key
+								</button>
+								<p className="text-sm text-base-content/60">
+									Don't have an API key?{' '}
+									<a
+										href="https://www.deepl.com/pro-api"
+										target="_blank"
+										rel="noopener noreferrer"
+										className="link link-primary font-semibold"
+									>
+										Get one for free at deepl.com/pro-api
+									</a>
+								</p>
+							</form>
+						</div>
+					</div>
+				)}
+
+				{!showApiKeyInput && apiKey && (
+					<div className="alert mb-6 shadow-lg">
+						<div className="flex-1">
+							<span>API key configured</span>
+						</div>
+						<div className="flex gap-2">
+							<button
+								type="button"
+								onClick={handleApiKeyChange}
+								className="btn btn-sm btn-ghost"
+							>
+								Change
+							</button>
+							<button
+								type="button"
+								onClick={handleApiKeyClear}
+								className="btn btn-sm btn-ghost"
+							>
+								Clear
+							</button>
+						</div>
+					</div>
+				)}
+
 				<div className="card bg-base-100 shadow-xl">
 					<div className="card-body">
 						<div className="text-center mb-6">
@@ -219,20 +338,6 @@ function App() {
 							</button>
 						</form>
 					</div>
-				</div>
-
-				<div className="text-center mt-8 p-4">
-					<p className="text-base-content/60">
-						Get your free DeepL API key at{' '}
-						<a
-							href="https://www.deepl.com/pro-api"
-							target="_blank"
-							rel="noopener noreferrer"
-							className="link link-primary font-semibold"
-						>
-							deepl.com/pro-api
-						</a>
-					</p>
 				</div>
 			</main>
 

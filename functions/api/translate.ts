@@ -1,13 +1,17 @@
 // Cloudflare Pages Function for document translation
-export const onRequestPost: PagesFunction<Env> = async (context) => {
-	const { request, env } = context
+export const onRequestPost: PagesFunction = async (context) => {
+	const { request } = context
 
 	try {
-		const apiKey = env.DEEPL_API_KEY
+		// Get API key from request header
+		const apiKey = request.headers.get('X-DeepL-API-Key')
 		if (!apiKey) {
 			return new Response(
-				JSON.stringify({ error: 'DEEPL_API_KEY not configured' }),
-				{ status: 500, headers: { 'Content-Type': 'application/json' } },
+				JSON.stringify({
+					error: 'API key not provided',
+					message: 'Please provide a DeepL API key',
+				}),
+				{ status: 401, headers: { 'Content-Type': 'application/json' } },
 			)
 		}
 

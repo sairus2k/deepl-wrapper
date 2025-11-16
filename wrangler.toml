@@ -5,6 +5,3 @@ pages_build_output_dir = "./dist"
 [dev]
 ip = "0.0.0.0"
 port = 8788
-
-# Local environment variables should be in .dev.vars file
-# Production/preview secrets configured in Cloudflare dashboard
