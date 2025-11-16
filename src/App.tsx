@@ -221,7 +221,7 @@ function App() {
 					</div>
 				</div>
 
-				<footer className="text-center mt-8 p-4">
+				<div className="text-center mt-8 p-4">
 					<p className="text-base-content/60">
 						Get your free DeepL API key at{' '}
 						<a
@@ -233,8 +233,23 @@ function App() {
 							deepl.com/pro-api
 						</a>
 					</p>
-				</footer>
+				</div>
 			</main>
+
+			<footer className="footer footer-center p-4 bg-base-200 text-base-content border-t">
+				<div>
+					<p>
+						<a
+							href="https://github.com/sairus2k/deepl-wrapper"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="link link-hover"
+						>
+							View on GitHub
+						</a>
+					</p>
+				</div>
+			</footer>
 		</div>
 	)
 }
