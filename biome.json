@@ -12,6 +12,12 @@
 		"enabled": true,
 		"indentStyle": "tab"
 	},
+	"json": {
+		"parser": {
+			"allowComments": true,
+			"allowTrailingCommas": true
+		}
+	},
 	"linter": {
 		"enabled": true,
 		"rules": {
