@@ -5,4 +5,6 @@ interface Env {
 	DEEPL_API_KEY: string
 }
 
-type PagesFunction<Env = unknown> = (context: EventContext<Env, any, any>) => Response | Promise<Response>
+type PagesFunction<Env = unknown> = (
+	context: EventContext<Env, string, unknown>,
+) => Response | Promise<Response>
