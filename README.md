@@ -1,102 +1,64 @@
 # DeepL File Translator
 
-A simple web wrapper for DeepL API that enables translation of file formats not supported in DeepL's free web version.
+I built this little tool because I sometimes need to translate Excel files using DeepL, but their free web interface only accepts Word, PDF, and PowerPoint documents.
 
-## The Problem
+It turns out the DeepL Free API actually supports this format (and more), so I whipped up this wrapper to bridge that gap.
 
-DeepL's free web version only supports `.doc(x)`, `.pdf`, and `.pptx` files. However, the DeepL API Free tier supports many more formats: `.txt`, `.html`, `.xlsx`, `.xliff`, `.srt`.
+## What it does
 
-## The Solution
+It's a lightweight web app that lets you use your own DeepL API key to translate files that the official web version rejects.
 
-A lightweight web application that lets you translate these additional file formats using DeepL API.
+- **Supported Formats**: TXT, HTML, XLSX, XLIFF, SRT
+- **Privacy**: Your API key stays in your browser's local storage. Files are sent to DeepL for translation and immediately discarded—nothing is saved on any server.
+- **Usage Tracking**: It shows you exactly how many characters you've used so you can keep an eye on your API limits.
 
-## Features
+> **Heads up:** DeepL treats every document upload as a minimum of 50,000 characters, even if the file is smaller. Since the free tier gives you 500,000 characters per month, this means you can translate a maximum of 10 documents per month.
 
-- 📄 **Formats DeepL web doesn't support**: TXT, HTML, XLSX, XLIFF, SRT
-- 🔑 **Bring Your Own Key (BYOK)** — Use your own DeepL API key, stored locally in your browser
-- 📊 **Usage Statistics** — Track your API character usage with real-time progress visualization
-- 🔒 **Privacy-first** — Files are processed and immediately discarded
-- ⚡ **Fast & simple** — No registration, no database, no bloat
-- ☁️ **Serverless deployment** — Runs on Cloudflare Pages with edge functions
-- 💾 **Client-side API key storage** — Your API key never leaves your browser
+## How to use it
 
-## Tech Stack
+1. Grab a free API key from [DeepL's developer portal](https://www.deepl.com/pro-api).
+2. Paste it into the app when prompted.
+3. Upload your file, pick your languages, and hit translate.
 
-**Frontend:**
-- React 19
-- TypeScript
-- Vite (Rolldown)
-- Tailwind CSS 4 + DaisyUI
+That's it.
 
-**Backend:**
-- Cloudflare Pages Functions
-- DeepL API (REST)
-- TypeScript
+## Running it locally
 
-## Quick Start
+If you want to tweak the code or run it on your own machine, it's a standard React + Vite setup.
 
 ```bash
-# Clone repository
+# Clone it
 git clone https://github.com/sairus2k/deepl-wrapper.git
 cd deepl-wrapper
 
-# Install dependencies
+# Install stuff
 pnpm install
 
-# Development (runs both Vite + Wrangler with HMR)
+# Run it
 pnpm dev
-# App will be available at http://localhost:5173
-# API functions run on http://localhost:8788
 ```
 
-When you first open the app, you'll be prompted to enter your DeepL API key. Get your free API key at https://www.deepl.com/pro-api
+The frontend will pop up at `http://localhost:5173`.
 
-Your API key is stored in your browser's localStorage and is sent directly to DeepL's API with each request.
+## Tech details
 
-## How API Keys Work
-
-This application uses a **Bring Your Own Key (BYOK)** approach:
-
-- When you first visit the app, you'll be prompted to enter your DeepL API key
-- Your API key is stored in your browser's localStorage
-- The key is sent directly to DeepL's API with each translation request via the `X-DeepL-API-Key` header
-- Your API key never leaves your browser or gets stored on any server
-- You can change or clear your API key at any time using the UI buttons
+For the curious, it's built with:
+- **React 19** & **TypeScript**
+- **Vite** (using Rolldown)
+- **Tailwind CSS 4** + **DaisyUI** for styling
+- **Cloudflare Pages** for hosting and edge functions
 
 ## Deployment
 
-### Deploy to Cloudflare Pages
+It's designed to run on Cloudflare Pages. Since there's no backend database or env vars, deployment is dead simple.
 
-1. Login to Cloudflare:
-   ```bash
-   pnpm wrangler login
-   ```
+```bash
+pnpm wrangler login
+pnpm deploy
+```
 
-2. Deploy:
-   ```bash
-   pnpm deploy
-   ```
-
-That's it! No environment variables or secrets required. Users will enter their own API keys when they use the app.
-
-### Alternative: Git Integration
-
-Connect your repository in Cloudflare Dashboard:
-- **Build command**: `pnpm build`
-- **Build output directory**: `dist`
-
-## How It Works
-
-1. Enter your DeepL API key (stored locally in your browser)
-2. Upload your file (TXT, HTML, XLSX, XLIFF, or SRT)
-3. Select source and target languages
-4. Click translate
-5. Download the translated file
-
-Files are processed via DeepL API and immediately discarded — nothing is stored.
-
-The app displays real-time API usage statistics with a visual progress bar that auto-updates after each translation.
+Or just connect your GitHub repo to Cloudflare Pages and set the build command to `pnpm build` and output directory to `dist`.
 
 ## License
 
-MIT
+MIT. Feel free to fork it or use it whatever you like.
